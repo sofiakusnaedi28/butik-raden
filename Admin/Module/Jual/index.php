@@ -127,10 +127,72 @@
                                                                 $stok = $hsl['stok'];
                                                                 $idb = $hsl['id_barang'];
 
-                                                                
+                                                                for($x=0;$x<$jumlah_dipilih;$x++){
+
+                                                                    $d = array($id_barang[$x],$id_member[$x],$jumlah[$x],$total[$x],$tgl_input[$x],$periode[$x]);
+                                                                    $sql = "INSERT INTO nota (id_barang,id_member,jumlah,total,tanggal_input,periode) vALUES(?,?,?,?,?,?)";
+                                                                    $row = $config->prepare($sql);
+                                                                    $row->execute($d);
+
+                                                                    // ubah stok barang
+                                                                    $sql_barang = "SELECT *FROM barang WHERE id_barang = ?";
+                                                                    $row_barang = $config->prepare($sql_barang);
+                                                                    $row_barang->execute(array($id_barang[$x]));
+                                                                    $hl = $row_barang->fetch();
+
+                                                                    $stok = $hsl['stok'];
+                                                                    $idb = $hsl['id_barang'];
+
+                                                                    $total_stok = $stok - $jumlah['$x'];
+                                                                    // echo $total_stok;
+                                                                    $sql_stok = "UPDATE barang SET stok = ? WHERE id_barang = ?";
+                                                                    $row_stok = $config->prepare($sql_stok);
+                                                                    $row_stok->execute(array($total_stok, $idb));
+
+                                                                }
+                                                                echo '<script>alert("Belanjaan Berhasil Di Bayar!");</script>';
+                                                            }else{
+                                                                echo '<script>alert("Uang Kurang ! Rp.'.$hitung.'"</script>';
                                                             }
                                                         }
                                                     }
+                                                    ?>
+                                                    <!-- aksi ke table nota -->
+                                                    <form method="POST" action="index.php?page=jual&nota=yes#kasirnya">
+                                                        <?php foreach($hasil_penjualan as $isi){;?>
+                                                        <input type="hidden" name="id_barang[]" value="<?php echo $isi['id_barang'];?>">
+                                                        <input type="hidden" name="id_member[]" value="<?php echo $isi['id_member'];?>">
+                                                        <input type="hidden" name="jumlah[]" value="<?php echo $isi['jumlah'];?>">
+                                                        <input type="hidden" name="total1[]" value="<?php echo $isi['total1'];?>">
+                                                        <input type="hidden" name="tgl_input[]" value="<?php echo $isi['tanggal_input'];?>">
+                                                        <input type="hidden" name="periode[]" value="<?php echo date['m-Y'];?>">
+                                                    <?php $no++}?>
+                                                    <tr>
+                                                        <td>Total Semua </td>
+                                                        <td><input type="text" class="form-control" name="total" value="<?php echo $total_bayar;?>"></td>
+
+                                                        <td>Bayar </td>
+                                                        <td><input type="text" class="form-control" name="bayar" value="<?php echo $bayar;?>"></td>
+                                                        <td><button class="btn btn-succes"><i class="fa fa-shopping-cart"></i> Bayar</button>
+                                                        <?php if(!empty($_GET['nota' == 'yes'])) {?>
+                                                         <a class="btnbtn-danger" href="fungsi/hapus/hapus.php?penjualan=jual">
+                                                             <b>RESET</b></a></td><?php }?></td>
+                                                    </tr>
+                                                    </form>
+                                                    <!-- aksi ke tabke nota -->
+                                                    <tr>
+                                                        <td>Kembali</td>
+                                                        <td><input type="text" class="form-control" value="<?php echo $hitung;?>"></td>
+                                                        <td></td>
+                                                        <td>
+                                                            <a href="print.php?nm_member=<?php echo $_SESSION['admin']['nm_member'];?>
+                                                            &bayar=<?php echo $bayar;?>&kembali=<?php echo $hitung;?>" target="_blank">
+                                                            <button class="btn btn-default">
+                                                                <i class="fa sa-print"></i> Print Untuk Bukti Pembayaran
+                                                            </button>></a>
+                                                        </td>
+
+                                                    </tr>
                                                 </table>
                                             </div>
                                             </tbody>
@@ -143,3 +205,26 @@
             </div>
         </section>
     </section>
+
+<script>
+    // AJAX call for autocomplete
+    $(document).ready(function(){
+        $("#cari").change(function(){
+            $.ajax({
+                type: "POST",
+                url: "fungsi/edit/edit.php?cari_barang=yes",
+                data: 'keyword='+$(this).val(),
+                beforeSend: function(){
+                    $("#hasil_cari").hide();
+                    $("#tunggu").html('<p style="color:green"><blink>tunggu sebentar</blink></p>');
+                },
+                  succes: function(html){
+                      $("#tunggu").html('');
+                      $("#hasil_cari").show();
+                      $("#hasil_cari").html(html);
+                  }
+            });
+});
+});
+//To select country name
+</script>
