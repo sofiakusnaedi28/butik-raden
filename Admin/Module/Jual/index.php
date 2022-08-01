@@ -151,7 +151,7 @@
 
                                                                 }
                                                                 echo '<script>alert("Belanjaan Berhasil Di Bayar!");</script>';
-                                                            }else{
+                                                            } else {
                                                                 echo '<script>alert("Uang Kurang ! Rp.'.$hitung.'"</script>';
                                                             }
                                                         }
